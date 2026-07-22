@@ -257,9 +257,43 @@ const exerciseLibrary = {
   "Legs":["Squats","Leg Press","Squats or Leg Press","Romanian Deadlifts","Deadlifts","Bulgarian Split Squats","Walking Lunges","Leg Curls","Leg Extensions","Hip Thrusts","Hack Squats","Goblet Squats","Calf Raises","Seated Calf Raises"],
   "Core":["Cable Crunches","Hanging Leg Raises","Ab Wheel Rollouts","Planks","Decline Sit-Ups","Russian Twists"]
 };
-let split = JSON.parse(localStorage.getItem("custom_workout_split") || "null") || defaultSplit;
+function makeExercise(name){
+  const id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : `ex_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  return {id, name};
+}
+function normalizeSplit(rawSplit){
+  const source = rawSplit || defaultSplit;
+  const normalized = {};
+  Object.entries(source).forEach(([day, info]) => {
+    normalized[day] = {
+      muscle: info.muscle,
+      exercises: info.exercises.map(ex => typeof ex === "string" ? makeExercise(ex) : ex)
+    };
+  });
+  return normalized;
+}
+let split = normalizeSplit(JSON.parse(localStorage.getItem("custom_workout_split") || "null"));
 const days = Object.keys(defaultSplit);
 function saveSplit(){ localStorage.setItem("custom_workout_split", JSON.stringify(split)); }
+saveSplit();
+
+function migrateDayData(day){
+  const data = JSON.parse(localStorage.getItem(storageKey(day)) || "{}");
+  const exercises = split[day].exercises;
+  let changed = false;
+  exercises.forEach((exercise, exIndex) => {
+    for(let set=1; set<=3; set++){
+      const oldKey = `${exIndex}_${set}`;
+      const newKey = `${exercise.id}_${set}`;
+      if(data[oldKey] && !data[newKey]){
+        data[newKey] = data[oldKey];
+        changed = true;
+      }
+    }
+  });
+  if(changed) localStorage.setItem(storageKey(day), JSON.stringify(data));
+}
+days.forEach(migrateDayData);
 const todayIndex = new Date().getDay();
 const weekdayMap = {1:"Monday",2:"Tuesday",3:"Wednesday",4:"Thursday",5:"Friday"};
 let currentDay = weekdayMap[todayIndex] || "Monday";
@@ -301,7 +335,7 @@ function renderWorkout() {
     card.className = "exercise";
     card.innerHTML = `
       <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
-        <div><h3>${exercise}</h3><div class="target">Target: 3 sets × 10 reps</div></div>
+        <div><h3>${exercise.name}</h3><div class="target">Target: 3 sets × 10 reps</div></div>
         <div style="display:flex;gap:5px">
           <button onclick="moveExercise(${exIndex},-1)" ${exIndex===0?'disabled':''} style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">↑</button>
           <button onclick="moveExercise(${exIndex},1)" ${exIndex===day.exercises.length-1?'disabled':''} style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">↓</button>
@@ -312,7 +346,7 @@ function renderWorkout() {
     `;
 
     for (let set = 1; set <= 3; set++) {
-      const key = `${exIndex}_${set}`;
+      const key = `${exercise.id}_${set}`;
       const setData = data[key] || {weight:"", reps:"10", done:false};
       const row = document.createElement("div");
       row.className = "set-row";
@@ -351,9 +385,27 @@ function renderWorkout() {
   updateProgress();
 }
 
-function addExercise(){const sel=document.getElementById("exerciseSelect");if(!sel.value)return;split[currentDay].exercises.push(sel.value);saveSplit();renderWorkout();}
-function moveExercise(index,dir){const a=split[currentDay].exercises,n=index+dir;if(n<0||n>=a.length)return;[a[index],a[n]]=[a[n],a[index]];saveSplit();localStorage.removeItem(storageKey(currentDay));renderWorkout();}
-function removeExercise(index){const name=split[currentDay].exercises[index];if(!confirm(`Remove ${name} from ${currentDay}?`))return;split[currentDay].exercises.splice(index,1);saveSplit();localStorage.removeItem(storageKey(currentDay));renderWorkout();}
+function addExercise(){
+  const sel=document.getElementById("exerciseSelect");
+  if(!sel.value)return;
+  split[currentDay].exercises.push(makeExercise(sel.value));
+  saveSplit();
+  renderWorkout();
+}
+function moveExercise(index,dir){
+  const a=split[currentDay].exercises,n=index+dir;
+  if(n<0||n>=a.length)return;
+  [a[index],a[n]]=[a[n],a[index]];
+  saveSplit();
+  renderWorkout();
+}
+function removeExercise(index){
+  const exercise=split[currentDay].exercises[index];
+  if(!confirm(`Remove ${exercise.name} from ${currentDay}?`))return;
+  split[currentDay].exercises.splice(index,1);
+  saveSplit();
+  renderWorkout();
+}
 
 function updateSet(key, field, value) {
   const data = getDayData(currentDay);
