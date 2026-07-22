@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>5-Day Workout Tracker</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card2: #1f2937;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --accent: #22c55e;
+      --border: #374151;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #0f172a, #020617);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .app {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 16px 14px 40px;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 12px 0 14px;
+    }
+    h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    .sub { color: var(--muted); font-size: .95rem; }
+    .day-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .day-tabs button {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .day-tabs button.active {
+      background: var(--accent);
+      color: #052e16;
+      border-color: var(--accent);
+    }
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--card);
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 14px;
+    }
+    .summary strong { display: block; font-size: 1.1rem; }
+    .summary span { color: var(--muted); font-size: .85rem; }
+    .exercise {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .exercise h3 { margin: 0 0 4px; font-size: 1.05rem; }
+    .exercise .target { color: var(--muted); font-size: .9rem; margin-bottom: 12px; }
+    .set-row {
+      display: grid;
+      grid-template-columns: 54px 1fr 1fr 48px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 8px;
+      font-size: 16px;
+    }
+    .check {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--card2);
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .check.done {
+      background: var(--accent);
+      color: #052e16;
+      border-color: var(--accent);
+    }
+    .labels {
+      display: grid;
+      grid-template-columns: 54px 1fr 1fr 48px;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .75rem;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .actions button {
+      padding: 13px;
+      border: 0;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .finish { background: var(--accent); color: #052e16; }
+    .reset { background: #7f1d1d; color: white; }
+    .history {
+      margin-top: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .history h2 { margin-top: 0; font-size: 1.2rem; }
+    .history-item {
+      border-top: 1px solid var(--border);
+      padding: 10px 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .history-item strong { color: var(--text); }
+    .empty { color: var(--muted); }
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .8rem;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Workout Tracker</h1>
+    <div class="sub">5-day split • 3 sets of 10</div>
+    <div class="day-tabs" id="dayTabs"></div>
+  </header>
+
+  <div class="summary">
+    <div><strong id="dayName">Monday</strong><span id="muscleName">Shoulders</span></div>
+    <div style="text-align:right"><strong id="progressText">0/15</strong><span>sets complete</span></div>
+  </div>
+
+  <main id="workout"></main>
+
+  <div class="actions">
+    <button class="finish" onclick="finishWorkout()">Finish Workout</button>
+    <button class="reset" onclick="resetDay()">Reset Day</button>
+  </div>
+
+  <section class="history">
+    <h2>Workout History</h2>
+    <div id="historyList"></div>
+  </section>
+
+  <footer>Your data is stored locally in this browser on your device.</footer>
+</div>
+
+<script>
+const defaultSplit = {
+  Monday: {
+    muscle: "Shoulders",
+    exercises: [
+      "Seated Dumbbell Shoulder Press",
+      "Dumbbell Lateral Raises",
+      "Rear Delt Flyes",
+      "Cable Lateral Raises",
+      "Face Pulls"
+    ]
+  },
+  Tuesday: {
+    muscle: "Chest + Triceps",
+    exercises: [
+      "Seated Dumbbell Shoulder Press",
+      "Bench Press",
+      "Incline Dumbbell Press",
+      "Cable Flyes",
+      "Tricep Pushdowns",
+      "Overhead Tricep Extensions"
+    ]
+  },
+  Wednesday: {
+    muscle: "Back + Biceps",
+    exercises: [
+      "Seated Dumbbell Shoulder Press",
+      "Lat Pulldowns",
+      "Chest-Supported Rows",
+      "Seated Cable Rows",
+      "EZ-Bar Curls",
+      "Hammer Curls"
+    ]
+  },
+  Thursday: {
+    muscle: "Legs",
+    exercises: [
+      "Seated Dumbbell Shoulder Press",
+      "Squats or Leg Press",
+      "Romanian Deadlifts",
+      "Bulgarian Split Squats",
+      "Leg Curls",
+      "Leg Extensions",
+      "Calf Raises"
+    ]
+  },
+  Friday: {
+    muscle: "Shoulders",
+    exercises: [
+      "Seated Dumbbell Shoulder Press",
+      "Cable Lateral Raises",
+      "Reverse Pec Deck",
+      "Upright Cable Rows",
+      "Rear Delt Flyes"
+    ]
+  }
+};
+
+const exerciseLibrary = {
+  "Shoulders":["Seated Dumbbell Shoulder Press","Standing Dumbbell Shoulder Press","Barbell Overhead Press","Arnold Press","Dumbbell Lateral Raises","Cable Lateral Raises","Machine Lateral Raise","Front Raises","Rear Delt Flyes","Reverse Pec Deck","Face Pulls","Upright Cable Rows"],
+  "Chest":["Bench Press","Dumbbell Bench Press","Incline Dumbbell Press","Incline Bench Press","Chest Press Machine","Push-Ups","Cable Flyes","Pec Deck","Dumbbell Flyes"],
+  "Back":["Lat Pulldowns","Pull-Ups","Chest-Supported Rows","Barbell Rows","Seated Cable Rows","One-Arm Dumbbell Rows","T-Bar Rows","Straight-Arm Pulldowns","Machine Rows"],
+  "Biceps":["EZ-Bar Curls","Barbell Curls","Dumbbell Curls","Hammer Curls","Incline Dumbbell Curls","Preacher Curls","Cable Curls","Concentration Curls"],
+  "Triceps":["Tricep Pushdowns","Rope Pushdowns","Overhead Tricep Extensions","Skull Crushers","Close-Grip Bench Press","Dips","Single-Arm Cable Extensions"],
+  "Legs":["Squats","Leg Press","Squats or Leg Press","Romanian Deadlifts","Deadlifts","Bulgarian Split Squats","Walking Lunges","Leg Curls","Leg Extensions","Hip Thrusts","Hack Squats","Goblet Squats","Calf Raises","Seated Calf Raises"],
+  "Core":["Cable Crunches","Hanging Leg Raises","Ab Wheel Rollouts","Planks","Decline Sit-Ups","Russian Twists"]
+};
+let split = JSON.parse(localStorage.getItem("custom_workout_split") || "null") || defaultSplit;
+const days = Object.keys(defaultSplit);
+function saveSplit(){ localStorage.setItem("custom_workout_split", JSON.stringify(split)); }
+const todayIndex = new Date().getDay();
+const weekdayMap = {1:"Monday",2:"Tuesday",3:"Wednesday",4:"Thursday",5:"Friday"};
+let currentDay = weekdayMap[todayIndex] || "Monday";
+
+function storageKey(day) {
+  return "workout_" + day;
+}
+
+function getDayData(day) {
+  return JSON.parse(localStorage.getItem(storageKey(day)) || "{}");
+}
+
+function saveDayData(day, data) {
+  localStorage.setItem(storageKey(day), JSON.stringify(data));
+}
+
+function renderTabs() {
+  const tabs = document.getElementById("dayTabs");
+  tabs.innerHTML = "";
+  days.forEach(day => {
+    const b = document.createElement("button");
+    b.textContent = day.slice(0,3);
+    b.className = day === currentDay ? "active" : "";
+    b.onclick = () => { currentDay = day; render(); };
+    tabs.appendChild(b);
+  });
+}
+
+function renderWorkout() {
+  const workout = document.getElementById("workout");
+  const day = split[currentDay];
+  const data = getDayData(currentDay);
+  workout.innerHTML = "";
+  document.getElementById("dayName").textContent = currentDay;
+  document.getElementById("muscleName").textContent = day.muscle;
+
+  day.exercises.forEach((exercise, exIndex) => {
+    const card = document.createElement("div");
+    card.className = "exercise";
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+        <div><h3>${exercise}</h3><div class="target">Target: 3 sets × 10 reps</div></div>
+        <div style="display:flex;gap:5px">
+          <button onclick="moveExercise(${exIndex},-1)" ${exIndex===0?'disabled':''} style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">↑</button>
+          <button onclick="moveExercise(${exIndex},1)" ${exIndex===day.exercises.length-1?'disabled':''} style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">↓</button>
+          <button onclick="removeExercise(${exIndex})" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">✕</button>
+        </div>
+      </div>
+      <div class="labels"><div>Set</div><div>Weight</div><div>Reps</div><div>Done</div></div>
+    `;
+
+    for (let set = 1; set <= 3; set++) {
+      const key = `${exIndex}_${set}`;
+      const setData = data[key] || {weight:"", reps:"10", done:false};
+      const row = document.createElement("div");
+      row.className = "set-row";
+      row.innerHTML = `
+        <div style="text-align:center;font-weight:700">#${set}</div>
+        <input inputmode="decimal" placeholder="lbs" value="${setData.weight ?? ""}" />
+        <input inputmode="numeric" placeholder="10" value="${setData.reps ?? "10"}" />
+        <button class="check ${setData.done ? "done" : ""}">${setData.done ? "✓" : ""}</button>
+      `;
+      const inputs = row.querySelectorAll("input");
+      const button = row.querySelector("button");
+
+      inputs[0].oninput = () => updateSet(key, "weight", inputs[0].value);
+      inputs[1].oninput = () => updateSet(key, "reps", inputs[1].value);
+      button.onclick = () => {
+        const latest = getDayData(currentDay);
+        const obj = latest[key] || {weight:inputs[0].value, reps:inputs[1].value, done:false};
+        obj.done = !obj.done;
+        latest[key] = obj;
+        saveDayData(currentDay, latest);
+        renderWorkout();
+      };
+      card.appendChild(row);
+    }
+    workout.appendChild(card);
+  });
+
+  const addCard=document.createElement("div");
+  addCard.className="exercise";
+  let opts='<option value="">Choose an exercise...</option>';
+  Object.entries(exerciseLibrary).forEach(([group,items])=>{
+    opts += `<optgroup label="${group}">` + items.map(x=>`<option value="${x}">${x}</option>`).join('') + '</optgroup>';
+  });
+  addCard.innerHTML=`<h3>Add Exercise</h3><div class="target">Exercises are grouped by muscle.</div><select id="exerciseSelect" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-size:16px">${opts}</select><button onclick="addExercise()" style="width:100%;margin-top:10px;padding:12px;border:0;border-radius:10px;background:var(--accent);color:#052e16;font-weight:700;font-size:16px">+ Add Exercise</button>`;
+  workout.appendChild(addCard);
+  updateProgress();
+}
+
+function addExercise(){const sel=document.getElementById("exerciseSelect");if(!sel.value)return;split[currentDay].exercises.push(sel.value);saveSplit();renderWorkout();}
+function moveExercise(index,dir){const a=split[currentDay].exercises,n=index+dir;if(n<0||n>=a.length)return;[a[index],a[n]]=[a[n],a[index]];saveSplit();localStorage.removeItem(storageKey(currentDay));renderWorkout();}
+function removeExercise(index){const name=split[currentDay].exercises[index];if(!confirm(`Remove ${name} from ${currentDay}?`))return;split[currentDay].exercises.splice(index,1);saveSplit();localStorage.removeItem(storageKey(currentDay));renderWorkout();}
+
+function updateSet(key, field, value) {
+  const data = getDayData(currentDay);
+  data[key] = data[key] || {weight:"", reps:"10", done:false};
+  data[key][field] = value;
+  saveDayData(currentDay, data);
+}
+
+function updateProgress() {
+  const data = getDayData(currentDay);
+  const total = split[currentDay].exercises.length * 3;
+  const complete = Object.values(data).filter(x => x.done).length;
+  document.getElementById("progressText").textContent = `${complete}/${total}`;
+}
+
+function finishWorkout() {
+  const data = getDayData(currentDay);
+  const total = split[currentDay].exercises.length * 3;
+  const complete = Object.values(data).filter(x => x.done).length;
+  const history = JSON.parse(localStorage.getItem("workout_history") || "[]");
+  history.unshift({
+    day: currentDay,
+    muscle: split[currentDay].muscle,
+    date: new Date().toLocaleDateString(),
+    completed: complete,
+    total: total
+  });
+  localStorage.setItem("workout_history", JSON.stringify(history.slice(0, 30)));
+  renderHistory();
+  alert(`Workout saved: ${complete}/${total} sets completed.`);
+}
+
+function resetDay() {
+  if (confirm(`Reset all entries for ${currentDay}?`)) {
+    localStorage.removeItem(storageKey(currentDay));
+    renderWorkout();
+  }
+}
+
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem("workout_history") || "[]");
+  const list = document.getElementById("historyList");
+  if (!history.length) {
+    list.innerHTML = '<div class="empty">No completed workouts yet.</div>';
+    return;
+  }
+  list.innerHTML = history.map(item => `
+    <div class="history-item">
+      <strong>${item.date} — ${item.day}</strong><br>
+      ${item.muscle}: ${item.completed}/${item.total} sets completed
+    </div>
+  `).join("");
+}
+
+function render() {
+  renderTabs();
+  renderWorkout();
+  renderHistory();
+}
+
+render();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(console.error);
+  });
+}
+</script>
+
+</body>
+</html>
