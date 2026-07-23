@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#111827" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
-  <title>5-Day Workout Tracker</title>
+<title>5-Day Workout Tracker</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -161,12 +159,14 @@
       margin-top: 20px;
     }
   </style>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
 </head>
 <body>
 <div class="app">
   <header>
     <h1>Workout Tracker</h1>
-    <div class="sub">5-day split • 3 sets of 10</div>
+    <div class="sub">5-day split • customizable sets & exercises</div>
     <div class="day-tabs" id="dayTabs"></div>
   </header>
 
@@ -192,125 +192,131 @@
 
 <script>
 const defaultSplit = {
-  Monday: {
-    muscle: "Shoulders",
-    exercises: [
-      "Seated Dumbbell Shoulder Press",
-      "Dumbbell Lateral Raises",
-      "Rear Delt Flyes",
-      "Cable Lateral Raises",
-      "Face Pulls"
-    ]
-  },
-  Tuesday: {
-    muscle: "Chest + Triceps",
-    exercises: [
-      "Seated Dumbbell Shoulder Press",
-      "Bench Press",
-      "Incline Dumbbell Press",
-      "Cable Flyes",
-      "Tricep Pushdowns",
-      "Overhead Tricep Extensions"
-    ]
-  },
-  Wednesday: {
-    muscle: "Back + Biceps",
-    exercises: [
-      "Seated Dumbbell Shoulder Press",
-      "Lat Pulldowns",
-      "Chest-Supported Rows",
-      "Seated Cable Rows",
-      "EZ-Bar Curls",
-      "Hammer Curls"
-    ]
-  },
-  Thursday: {
-    muscle: "Legs",
-    exercises: [
-      "Seated Dumbbell Shoulder Press",
-      "Squats or Leg Press",
-      "Romanian Deadlifts",
-      "Bulgarian Split Squats",
-      "Leg Curls",
-      "Leg Extensions",
-      "Calf Raises"
-    ]
-  },
-  Friday: {
-    muscle: "Shoulders",
-    exercises: [
-      "Seated Dumbbell Shoulder Press",
-      "Cable Lateral Raises",
-      "Reverse Pec Deck",
-      "Upright Cable Rows",
-      "Rear Delt Flyes"
-    ]
-  }
+  Monday: { muscle: "Shoulders", exercises: [
+    "Seated Dumbbell Shoulder Press","Dumbbell Lateral Raises","Rear Delt Flyes","Cable Lateral Raises","Face Pulls"
+  ]},
+  Tuesday: { muscle: "Chest + Triceps", exercises: [
+    "Seated Dumbbell Shoulder Press","Bench Press","Incline Dumbbell Press","Cable Flyes","Tricep Pushdowns","Overhead Tricep Extensions"
+  ]},
+  Wednesday: { muscle: "Back + Biceps", exercises: [
+    "Seated Dumbbell Shoulder Press","Lat Pulldowns","Chest-Supported Rows","Seated Cable Rows","EZ-Bar Curls","Hammer Curls"
+  ]},
+  Thursday: { muscle: "Legs", exercises: [
+    "Seated Dumbbell Shoulder Press","Squats or Leg Press","Romanian Deadlifts","Bulgarian Split Squats","Leg Curls","Leg Extensions","Calf Raises"
+  ]},
+  Friday: { muscle: "Shoulders", exercises: [
+    "Seated Dumbbell Shoulder Press","Cable Lateral Raises","Reverse Pec Deck","Upright Cable Rows","Rear Delt Flyes"
+  ]}
 };
 
 const exerciseLibrary = {
-  "Shoulders":["Seated Dumbbell Shoulder Press","Standing Dumbbell Shoulder Press","Barbell Overhead Press","Arnold Press","Dumbbell Lateral Raises","Cable Lateral Raises","Machine Lateral Raise","Front Raises","Rear Delt Flyes","Reverse Pec Deck","Face Pulls","Upright Cable Rows"],
-  "Chest":["Bench Press","Dumbbell Bench Press","Incline Dumbbell Press","Incline Bench Press","Chest Press Machine","Push-Ups","Cable Flyes","Pec Deck","Dumbbell Flyes"],
-  "Back":["Lat Pulldowns","Pull-Ups","Chest-Supported Rows","Barbell Rows","Seated Cable Rows","One-Arm Dumbbell Rows","T-Bar Rows","Straight-Arm Pulldowns","Machine Rows"],
-  "Biceps":["EZ-Bar Curls","Barbell Curls","Dumbbell Curls","Hammer Curls","Incline Dumbbell Curls","Preacher Curls","Cable Curls","Concentration Curls"],
-  "Triceps":["Tricep Pushdowns","Rope Pushdowns","Overhead Tricep Extensions","Skull Crushers","Close-Grip Bench Press","Dips","Single-Arm Cable Extensions"],
-  "Legs":["Squats","Leg Press","Squats or Leg Press","Romanian Deadlifts","Deadlifts","Bulgarian Split Squats","Walking Lunges","Leg Curls","Leg Extensions","Hip Thrusts","Hack Squats","Goblet Squats","Calf Raises","Seated Calf Raises"],
-  "Core":["Cable Crunches","Hanging Leg Raises","Ab Wheel Rollouts","Planks","Decline Sit-Ups","Russian Twists"]
+  "Shoulders": [
+    "Seated Dumbbell Shoulder Press","Standing Dumbbell Shoulder Press","Barbell Overhead Press","Arnold Press",
+    "Dumbbell Lateral Raises","Cable Lateral Raises","Machine Lateral Raise","Front Raises","Rear Delt Flyes",
+    "Reverse Pec Deck","Face Pulls","Upright Cable Rows"
+  ],
+  "Chest": [
+    "Bench Press","Dumbbell Bench Press","Incline Dumbbell Press","Incline Bench Press","Chest Press Machine",
+    "Push-Ups","Cable Flyes","Pec Deck","Dumbbell Flyes"
+  ],
+  "Back": [
+    "Lat Pulldowns","Pull-Ups","Chest-Supported Rows","Barbell Rows","Seated Cable Rows","One-Arm Dumbbell Rows",
+    "T-Bar Rows","Straight-Arm Pulldowns","Machine Rows"
+  ],
+  "Biceps": [
+    "EZ-Bar Curls","Barbell Curls","Dumbbell Curls","Hammer Curls","Incline Dumbbell Curls","Preacher Curls",
+    "Cable Curls","Concentration Curls"
+  ],
+  "Triceps": [
+    "Tricep Pushdowns","Rope Pushdowns","Overhead Tricep Extensions","Skull Crushers","Close-Grip Bench Press",
+    "Dips","Single-Arm Cable Extensions"
+  ],
+  "Legs": [
+    "Squats","Leg Press","Squats or Leg Press","Romanian Deadlifts","Deadlifts","Bulgarian Split Squats",
+    "Walking Lunges","Leg Curls","Leg Extensions","Hip Thrusts","Hack Squats","Goblet Squats","Calf Raises",
+    "Seated Calf Raises"
+  ],
+  "Core": [
+    "Cable Crunches","Hanging Leg Raises","Ab Wheel Rollouts","Planks","Decline Sit-Ups","Russian Twists"
+  ],
+  "Resistance Bands": [
+    "Band Shoulder Press","Band Lateral Raise","Band Front Raise","Band Pull-Apart","Band Face Pull",
+    "Band Chest Press","Band Chest Fly","Band Push-Up","Band Lat Pulldown","Band Seated Row",
+    "Band Bent-Over Row","Band Straight-Arm Pulldown","Band Bicep Curl","Band Hammer Curl",
+    "Band Tricep Pushdown","Band Overhead Tricep Extension","Band Squat","Band Romanian Deadlift",
+    "Band Good Morning","Band Lateral Walk","Band Glute Bridge","Band Hip Thrust","Band Leg Curl",
+    "Band Leg Extension","Band Calf Raise","Band Pallof Press","Band Wood Chop"
+  ]
 };
-function makeExercise(name){
-  const id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : `ex_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-  return {id, name};
+
+const days = Object.keys(defaultSplit);
+
+function makeId(prefix){
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return `${prefix}_${window.crypto.randomUUID()}`;
+  }
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 }
+function makeSet(){ return { id: makeId("set") }; }
+function makeExercise(name){
+  return { id: makeId("ex"), name, sets: [makeSet(), makeSet(), makeSet()] };
+}
+function storageKey(day){ return "workout_" + day; }
+function getDayData(day){ return JSON.parse(localStorage.getItem(storageKey(day)) || "{}"); }
+function saveDayData(day,data){ localStorage.setItem(storageKey(day), JSON.stringify(data)); }
+
 function normalizeSplit(rawSplit){
   const source = rawSplit || defaultSplit;
   const normalized = {};
   Object.entries(source).forEach(([day, info]) => {
     normalized[day] = {
       muscle: info.muscle,
-      exercises: info.exercises.map(ex => typeof ex === "string" ? makeExercise(ex) : ex)
+      exercises: (info.exercises || []).map(ex => {
+        if (typeof ex === "string") return makeExercise(ex);
+        const copy = {...ex};
+        copy.id = copy.id || makeId("ex");
+        copy.name = copy.name || "Exercise";
+        if (!Array.isArray(copy.sets) || !copy.sets.length) {
+          copy.sets = [makeSet(), makeSet(), makeSet()];
+        } else {
+          copy.sets = copy.sets.map(s => ({id: (s && s.id) ? s.id : makeId("set")}));
+        }
+        return copy;
+      })
     };
   });
   return normalized;
 }
+
 let split = normalizeSplit(JSON.parse(localStorage.getItem("custom_workout_split") || "null"));
-const days = Object.keys(defaultSplit);
 function saveSplit(){ localStorage.setItem("custom_workout_split", JSON.stringify(split)); }
-saveSplit();
 
-function migrateDayData(day){
-  const data = JSON.parse(localStorage.getItem(storageKey(day)) || "{}");
-  const exercises = split[day].exercises;
-  let changed = false;
-  exercises.forEach((exercise, exIndex) => {
-    for(let set=1; set<=3; set++){
-      const oldKey = `${exIndex}_${set}`;
-      const newKey = `${exercise.id}_${set}`;
-      if(data[oldKey] && !data[newKey]){
-        data[newKey] = data[oldKey];
-        changed = true;
-      }
-    }
+// Migrate v2/v3 data keyed as exerciseId_1, exerciseId_2, exerciseId_3
+// into stable exerciseId_setId keys, without deleting the old entries.
+function migrateStableSetIds(){
+  days.forEach(day => {
+    const data = getDayData(day);
+    let changed = false;
+    (split[day]?.exercises || []).forEach(exercise => {
+      exercise.sets.forEach((setObj, index) => {
+        const oldKey = `${exercise.id}_${index + 1}`;
+        const newKey = `${exercise.id}_${setObj.id}`;
+        if (data[oldKey] && !data[newKey]) {
+          data[newKey] = data[oldKey];
+          changed = true;
+        }
+      });
+    });
+    if (changed) saveDayData(day, data);
   });
-  if(changed) localStorage.setItem(storageKey(day), JSON.stringify(data));
 }
-days.forEach(migrateDayData);
-const todayIndex = new Date().getDay();
+saveSplit();
+migrateStableSetIds();
+
 const weekdayMap = {1:"Monday",2:"Tuesday",3:"Wednesday",4:"Thursday",5:"Friday"};
-let currentDay = weekdayMap[todayIndex] || "Monday";
+let currentDay = weekdayMap[new Date().getDay()] || "Monday";
 
-function storageKey(day) {
-  return "workout_" + day;
-}
-
-function getDayData(day) {
-  return JSON.parse(localStorage.getItem(storageKey(day)) || "{}");
-}
-
-function saveDayData(day, data) {
-  localStorage.setItem(storageKey(day), JSON.stringify(data));
-}
-
-function renderTabs() {
+function renderTabs(){
   const tabs = document.getElementById("dayTabs");
   tabs.innerHTML = "";
   days.forEach(day => {
@@ -322,46 +328,89 @@ function renderTabs() {
   });
 }
 
-function renderWorkout() {
+function setKey(exercise, setObj){ return `${exercise.id}_${setObj.id}`; }
+
+function renderWorkout(){
   const workout = document.getElementById("workout");
   const day = split[currentDay];
   const data = getDayData(currentDay);
   workout.innerHTML = "";
+
   document.getElementById("dayName").textContent = currentDay;
   document.getElementById("muscleName").textContent = day.muscle;
+
+  // Day swapping control
+  const swapCard = document.createElement("div");
+  swapCard.className = "exercise";
+  const otherDays = days.filter(d => d !== currentDay);
+  swapCard.innerHTML = `
+    <h3>Swap Workout Day</h3>
+    <div class="target">Move this whole workout, including its saved set data, to another weekday.</div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+      <select id="swapDaySelect" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-size:16px">
+        ${otherDays.map(d => `<option value="${d}">${d} — ${split[d].muscle}</option>`).join("")}
+      </select>
+      <button onclick="swapDays()" style="padding:0 14px;border:0;border-radius:10px;background:var(--accent);color:#052e16;font-weight:700">Swap</button>
+    </div>`;
+  workout.appendChild(swapCard);
 
   day.exercises.forEach((exercise, exIndex) => {
     const card = document.createElement("div");
     card.className = "exercise";
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
-        <div><h3>${exercise.name}</h3><div class="target">Target: 3 sets × 10 reps</div></div>
-        <div style="display:flex;gap:5px">
-          <button onclick="moveExercise(${exIndex},-1)" ${exIndex===0?'disabled':''} style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">↑</button>
-          <button onclick="moveExercise(${exIndex},1)" ${exIndex===day.exercises.length-1?'disabled':''} style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">↓</button>
-          <button onclick="removeExercise(${exIndex})" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">✕</button>
-        </div>
-      </div>
-      <div class="labels"><div>Set</div><div>Weight</div><div>Reps</div><div>Done</div></div>
-    `;
 
-    for (let set = 1; set <= 3; set++) {
-      const key = `${exercise.id}_${set}`;
+    const header = document.createElement("div");
+    header.style.cssText = "display:flex;justify-content:space-between;gap:8px;align-items:flex-start";
+    header.innerHTML = `
+      <div>
+        <h3>${exercise.name}</h3>
+        <div class="target">${exercise.sets.length} set${exercise.sets.length===1?"":"s"} • target 10 reps each</div>
+      </div>
+      <div class="exercise-controls" style="display:flex;gap:5px">
+        <button class="move-up" ${exIndex===0?'disabled':''} style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">↑</button>
+        <button class="move-down" ${exIndex===day.exercises.length-1?'disabled':''} style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text)">↓</button>
+        <button class="remove-exercise" aria-label="Remove ${exercise.name}" style="width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#7f1d1d;color:white">✕</button>
+      </div>`;
+    card.appendChild(header);
+
+    const upButton = header.querySelector(".move-up");
+    const downButton = header.querySelector(".move-down");
+    const removeButton = header.querySelector(".remove-exercise");
+
+    upButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      moveExercise(exIndex, -1);
+    });
+
+    downButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      moveExercise(exIndex, 1);
+    });
+
+    removeButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      removeExercise(exIndex);
+    });
+
+    const labels = document.createElement("div");
+    labels.className = "labels";
+    labels.innerHTML = "<div>Set</div><div>Weight</div><div>Reps</div><div>Done</div>";
+    card.appendChild(labels);
+
+    exercise.sets.forEach((setObj, setIndex) => {
+      const key = setKey(exercise, setObj);
       const setData = data[key] || {weight:"", reps:"10", done:false};
       const row = document.createElement("div");
       row.className = "set-row";
       row.innerHTML = `
-        <div style="text-align:center;font-weight:700">#${set}</div>
+        <div style="text-align:center;font-weight:700">#${setIndex + 1}</div>
         <input inputmode="decimal" placeholder="lbs" value="${setData.weight ?? ""}" />
         <input inputmode="numeric" placeholder="10" value="${setData.reps ?? "10"}" />
-        <button class="check ${setData.done ? "done" : ""}">${setData.done ? "✓" : ""}</button>
-      `;
+        <button class="check ${setData.done ? "done" : ""}">${setData.done ? "✓" : ""}</button>`;
       const inputs = row.querySelectorAll("input");
-      const button = row.querySelector("button");
-
+      const doneButton = row.querySelector("button");
       inputs[0].oninput = () => updateSet(key, "weight", inputs[0].value);
       inputs[1].oninput = () => updateSet(key, "reps", inputs[1].value);
-      button.onclick = () => {
+      doneButton.onclick = () => {
         const latest = getDayData(currentDay);
         const obj = latest[key] || {weight:inputs[0].value, reps:inputs[1].value, done:false};
         obj.done = !obj.done;
@@ -370,82 +419,149 @@ function renderWorkout() {
         renderWorkout();
       };
       card.appendChild(row);
-    }
+    });
+
+    const setControls = document.createElement("div");
+    setControls.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px";
+    setControls.innerHTML = `
+      <button onclick="addSet(${exIndex})" style="padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--card2);color:var(--text);font-weight:700">+ Add Set</button>
+      <button onclick="removeLastSet(${exIndex})" ${exercise.sets.length<=1?'disabled':''} style="padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--card2);color:var(--text);font-weight:700">− Remove Set</button>`;
+    card.appendChild(setControls);
+
     workout.appendChild(card);
   });
 
-  const addCard=document.createElement("div");
-  addCard.className="exercise";
-  let opts='<option value="">Choose an exercise...</option>';
-  Object.entries(exerciseLibrary).forEach(([group,items])=>{
-    opts += `<optgroup label="${group}">` + items.map(x=>`<option value="${x}">${x}</option>`).join('') + '</optgroup>';
+  const addCard = document.createElement("div");
+  addCard.className = "exercise";
+  let opts = '<option value="">Choose an exercise...</option>';
+  Object.entries(exerciseLibrary).forEach(([group, items]) => {
+    opts += `<optgroup label="${group}">${items.map(x => `<option value="${x}">${x}</option>`).join("")}</optgroup>`;
   });
-  addCard.innerHTML=`<h3>Add Exercise</h3><div class="target">Exercises are grouped by muscle.</div><select id="exerciseSelect" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-size:16px">${opts}</select><button onclick="addExercise()" style="width:100%;margin-top:10px;padding:12px;border:0;border-radius:10px;background:var(--accent);color:#052e16;font-weight:700;font-size:16px">+ Add Exercise</button>`;
+  addCard.innerHTML = `
+    <h3>Add Exercise</h3>
+    <div class="target">Exercises are grouped by muscle, including resistance bands.</div>
+    <select id="exerciseSelect" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-size:16px">${opts}</select>
+    <button onclick="addExercise()" style="width:100%;margin-top:10px;padding:12px;border:0;border-radius:10px;background:var(--accent);color:#052e16;font-weight:700;font-size:16px">+ Add Exercise</button>`;
   workout.appendChild(addCard);
+
   updateProgress();
 }
 
 function addExercise(){
-  const sel=document.getElementById("exerciseSelect");
-  if(!sel.value)return;
+  const sel = document.getElementById("exerciseSelect");
+  if (!sel.value) return;
   split[currentDay].exercises.push(makeExercise(sel.value));
   saveSplit();
   renderWorkout();
 }
 function moveExercise(index,dir){
-  const a=split[currentDay].exercises,n=index+dir;
-  if(n<0||n>=a.length)return;
-  [a[index],a[n]]=[a[n],a[index]];
+  const a = split[currentDay].exercises;
+  const n = index + dir;
+  if (n < 0 || n >= a.length) return;
+  [a[index],a[n]] = [a[n],a[index]];
   saveSplit();
   renderWorkout();
 }
 function removeExercise(index){
-  const exercise=split[currentDay].exercises[index];
-  if(!confirm(`Remove ${exercise.name} from ${currentDay}?`))return;
-  split[currentDay].exercises.splice(index,1);
+  const exercises = split[currentDay].exercises;
+  const exercise = exercises[index];
+  if (!exercise) return;
+
+  const shouldRemove = window.confirm(`Remove ${exercise.name} from ${currentDay}?`);
+  if (!shouldRemove) return;
+
+  exercises.splice(index, 1);
+  saveSplit();
+  renderWorkout();
+}
+function addSet(exIndex){
+  split[currentDay].exercises[exIndex].sets.push(makeSet());
+  saveSplit();
+  renderWorkout();
+}
+function removeLastSet(exIndex){
+  const exercise = split[currentDay].exercises[exIndex];
+  if (exercise.sets.length <= 1) return;
+  const removed = exercise.sets[exercise.sets.length - 1];
+  const data = getDayData(currentDay);
+  const key = setKey(exercise, removed);
+  if (data[key] && (data[key].weight || data[key].done || data[key].reps !== "10")) {
+    if (!confirm("The last set has logged data. Remove that set anyway?")) return;
+  }
+  exercise.sets.pop();
   saveSplit();
   renderWorkout();
 }
 
-function updateSet(key, field, value) {
-  const data = getDayData(currentDay);
-  data[key] = data[key] || {weight:"", reps:"10", done:false};
-  data[key][field] = value;
-  saveDayData(currentDay, data);
+function swapDays(){
+  const target = document.getElementById("swapDaySelect").value;
+  if (!target || target === currentDay) return;
+  const source = currentDay;
+
+  // Swap the full workout definitions.
+  [split[source], split[target]] = [split[target], split[source]];
+  saveSplit();
+
+  // Swap the saved workout-entry data so it follows the workout.
+  const sourceData = localStorage.getItem(storageKey(source));
+  const targetData = localStorage.getItem(storageKey(target));
+  if (targetData === null) localStorage.removeItem(storageKey(source));
+  else localStorage.setItem(storageKey(source), targetData);
+  if (sourceData === null) localStorage.removeItem(storageKey(target));
+  else localStorage.setItem(storageKey(target), sourceData);
+
+  render();
 }
 
-function updateProgress() {
+function updateSet(key,field,value){
   const data = getDayData(currentDay);
-  const total = split[currentDay].exercises.length * 3;
-  const complete = Object.values(data).filter(x => x.done).length;
+  data[key] = data[key] || {weight:"",reps:"10",done:false};
+  data[key][field] = value;
+  saveDayData(currentDay,data);
+}
+
+function updateProgress(){
+  const data = getDayData(currentDay);
+  let total = 0, complete = 0;
+  split[currentDay].exercises.forEach(exercise => {
+    exercise.sets.forEach(setObj => {
+      total++;
+      if (data[setKey(exercise,setObj)]?.done) complete++;
+    });
+  });
   document.getElementById("progressText").textContent = `${complete}/${total}`;
 }
 
-function finishWorkout() {
+function finishWorkout(){
   const data = getDayData(currentDay);
-  const total = split[currentDay].exercises.length * 3;
-  const complete = Object.values(data).filter(x => x.done).length;
+  let total = 0, complete = 0;
+  split[currentDay].exercises.forEach(exercise => {
+    exercise.sets.forEach(setObj => {
+      total++;
+      if (data[setKey(exercise,setObj)]?.done) complete++;
+    });
+  });
   const history = JSON.parse(localStorage.getItem("workout_history") || "[]");
   history.unshift({
     day: currentDay,
     muscle: split[currentDay].muscle,
     date: new Date().toLocaleDateString(),
     completed: complete,
-    total: total
+    total
   });
-  localStorage.setItem("workout_history", JSON.stringify(history.slice(0, 30)));
+  localStorage.setItem("workout_history", JSON.stringify(history.slice(0,30)));
   renderHistory();
   alert(`Workout saved: ${complete}/${total} sets completed.`);
 }
 
-function resetDay() {
-  if (confirm(`Reset all entries for ${currentDay}?`)) {
+function resetDay(){
+  if (confirm(`Reset all entered weights, reps, and checkmarks for ${currentDay}?`)) {
     localStorage.removeItem(storageKey(currentDay));
     renderWorkout();
   }
 }
 
-function renderHistory() {
+function renderHistory(){
   const history = JSON.parse(localStorage.getItem("workout_history") || "[]");
   const list = document.getElementById("historyList");
   if (!history.length) {
@@ -456,18 +572,19 @@ function renderHistory() {
     <div class="history-item">
       <strong>${item.date} — ${item.day}</strong><br>
       ${item.muscle}: ${item.completed}/${item.total} sets completed
-    </div>
-  `).join("");
+    </div>`).join("");
 }
 
-function render() {
+function render(){
   renderTabs();
   renderWorkout();
   renderHistory();
 }
-
 render();
 </script>
+
+
+
 
 <script>
 if ("serviceWorker" in navigator) {
