@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#111827" />
-  <link rel="manifest" href="manifest.json?v=8" />
-  <link rel="apple-touch-icon" href="icon-192.png?v=8" />
+  <link rel="manifest" href="manifest.json?v=9" />
+  <link rel="apple-touch-icon" href="icon-192.png?v=9" />
 <title>5-Day Workout Tracker</title>
   <style>
     :root {
@@ -375,7 +375,7 @@ function renderWorkout(){
     header.style.cssText = "display:flex;justify-content:space-between;gap:8px;align-items:flex-start";
     header.innerHTML = `
       <div style="flex:1;min-width:0">
-        <div class="drag-handle" style="font-size:18px;color:var(--muted);margin-bottom:5px;user-select:none;touch-action:none;cursor:grab">☰ Drag to reorder</div>
+        <div class="drag-handle" style="display:inline-flex;width:auto;max-width:max-content;font-size:18px;color:var(--muted);margin-bottom:5px;user-select:none;touch-action:none;cursor:grab;align-items:center;gap:4px">☰ Drag to reorder</div>
         <select class="exercise-name-select" aria-label="Change exercise" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px;font-size:16px;font-weight:700">
           ${exerciseOptionsHtml(exercise.name)}
         </select>
@@ -402,14 +402,14 @@ function renderWorkout(){
     });
 
     let pointerDragging = false;
-    let pointerStartY = 0;
+    let activePointerId = null;
 
     const dragHandle = header.querySelector(".drag-handle");
 
     dragHandle.addEventListener("pointerdown", (event) => {
       event.preventDefault();
       pointerDragging = true;
-      pointerStartY = event.clientY;
+      activePointerId = event.pointerId;
       card.setPointerCapture(event.pointerId);
       card.style.opacity = "0.6";
       card.style.transform = "scale(0.995)";
@@ -418,7 +418,7 @@ function renderWorkout(){
     });
 
     card.addEventListener("pointermove", (event) => {
-      if (!pointerDragging) return;
+      if (!pointerDragging || event.pointerId !== activePointerId) return;
       event.preventDefault();
 
       const cards = [...document.querySelectorAll(".exercise[data-exercise-id]")];
@@ -429,12 +429,18 @@ function renderWorkout(){
       });
 
       cards.forEach(el => el.style.outline = "");
-      if (hovered) hovered.style.outline = "2px dashed var(--accent)";
+
+      if (hovered) {
+        hovered.style.outline = "2px dashed var(--accent)";
+        reorderExerciseByIdLive(exercise.id, hovered.dataset.exerciseId, event.clientY);
+      }
     });
 
     function finishPointerDrag(event) {
-      if (!pointerDragging) return;
+      if (!pointerDragging || event.pointerId !== activePointerId) return;
+
       pointerDragging = false;
+      activePointerId = null;
 
       try { card.releasePointerCapture(event.pointerId); } catch (_) {}
       card.style.opacity = "";
@@ -442,15 +448,9 @@ function renderWorkout(){
       card.style.zIndex = "";
       dragHandle.style.cursor = "grab";
 
-      const cards = [...document.querySelectorAll(".exercise[data-exercise-id]")];
-      const hovered = cards.find(other => {
-        if (other === card) return false;
-        const rect = other.getBoundingClientRect();
-        return event.clientY >= rect.top && event.clientY <= rect.bottom;
-      });
-
-      cards.forEach(el => el.style.outline = "");
-      if (hovered) reorderExerciseById(exercise.id, hovered.dataset.exerciseId);
+      document.querySelectorAll(".exercise").forEach(el => el.style.outline = "");
+      saveSplit();
+      renderWorkout();
     }
 
     card.addEventListener("pointerup", finishPointerDrag);
@@ -517,19 +517,36 @@ function addExercise(){
   renderWorkout();
 }
 
-function reorderExerciseById(draggedId, targetId){
+function reorderExerciseByIdLive(draggedId, targetId, pointerY){
   const exercises = split[currentDay].exercises;
   const fromIndex = exercises.findIndex(ex => ex.id === draggedId);
-  const toIndex = exercises.findIndex(ex => ex.id === targetId);
-  if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
+  const targetIndex = exercises.findIndex(ex => ex.id === targetId);
+  if (fromIndex < 0 || targetIndex < 0 || fromIndex === targetIndex) return;
+
+  const targetCard = document.querySelector(`.exercise[data-exercise-id="${targetId}"]`);
+  if (!targetCard) return;
+
+  const rect = targetCard.getBoundingClientRect();
+  const placeAfter = pointerY > rect.top + rect.height / 2;
 
   const [moved] = exercises.splice(fromIndex, 1);
-  let insertIndex = toIndex;
-  if (fromIndex < toIndex) insertIndex -= 1;
-  exercises.splice(insertIndex, 0, moved);
 
+  let insertIndex = exercises.findIndex(ex => ex.id === targetId);
+  if (insertIndex < 0) insertIndex = exercises.length;
+  if (placeAfter) insertIndex += 1;
+
+  exercises.splice(insertIndex, 0, moved);
   saveSplit();
   renderWorkout();
+
+  requestAnimationFrame(() => {
+    const newCard = document.querySelector(`.exercise[data-exercise-id="${draggedId}"]`);
+    if (newCard) {
+      newCard.style.opacity = "0.6";
+      newCard.style.transform = "scale(0.995)";
+      newCard.style.zIndex = "20";
+    }
+  });
 }
 function moveExercise(index,dir){
   const a = split[currentDay].exercises;
@@ -667,7 +684,7 @@ render();
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register("./service-worker.js?v=8");
+      const registration = await navigator.serviceWorker.register("./service-worker.js?v=9");
       await registration.update();
     } catch (err) {
       console.error("Service worker update failed:", err);

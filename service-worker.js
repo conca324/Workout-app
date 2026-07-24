@@ -1,4 +1,4 @@
-const CACHE = "workout-tracker-v8";
+const CACHE = "workout-tracker-v9";
 const STATIC_ASSETS = [
   "./icon-192.png",
   "./icon-512.png"
