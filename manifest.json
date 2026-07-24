@@ -6,7 +6,7 @@
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#111827",
-  "description": "A simple 5-day workout tracker with progress saved on your device.",
+  "description": "Customizable workout tracker with saved sets, exercise swaps, and drag reordering.",
   "icons": [
     {
       "src": "icon-192.png",
