@@ -1,23 +1,17 @@
-INSTALLING YOUR WORKOUT TRACKER
+WORKOUT TRACKER PWA v8
 
-This folder is a Progressive Web App (PWA).
+Important data note:
+Your workout records are stored by the website origin in browser localStorage.
+Keep using the exact same GitHub Pages URL to preserve the records already stored there.
 
-IMPORTANT:
-A PWA must be served from a secure website (HTTPS) for Android/Chrome installation.
-Opening index.html directly from your Downloads folder will not fully enable installation/offline mode.
+Do NOT use a downloaded local HTML file to check whether your GitHub Pages records survived.
+A local file has separate browser storage and will appear empty.
 
-EASIEST HOSTING OPTIONS:
-1. Netlify Drop:
-   - Go to Netlify Drop in your browser.
-   - Upload this whole workout_pwa folder (or unzip the ZIP first).
-   - Netlify gives you a public HTTPS link.
-   - Open that link in Chrome on Android.
-   - Tap the three-dot menu and choose "Add to Home screen" or "Install app".
+Update steps:
+1. Replace index.html, manifest.json, service-worker.js, icon-192.png, and icon-512.png in the SAME GitHub repository.
+2. Keep the SAME GitHub Pages URL.
+3. Open the GitHub Pages site in your browser.
+4. Refresh the page once.
+5. If the installed app still shows an old icon/manifest, close the installed app and reopen the site in the browser before reinstalling.
 
-2. GitHub Pages:
-   - Create a GitHub repository.
-   - Upload all files from this folder.
-   - Enable Pages in the repository settings.
-   - Open the generated HTTPS site in Chrome and install it.
-
-Your workout entries are stored locally on the device/browser where you use the app.
+Do not clear site data before verifying your records.
