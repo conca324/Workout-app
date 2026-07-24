@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#111827" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
 <title>5-Day Workout Tracker</title>
   <style>
     :root {
@@ -161,6 +159,8 @@
       margin-top: 20px;
     }
   </style>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
 </head>
 <body>
 <div class="app">
@@ -369,13 +369,13 @@ function renderWorkout(){
     card.className = "exercise";
     card.draggable = true;
     card.dataset.exerciseId = exercise.id;
-    card.style.touchAction = "pan-x";
+    card.style.touchAction = "auto";
 
     const header = document.createElement("div");
     header.style.cssText = "display:flex;justify-content:space-between;gap:8px;align-items:flex-start";
     header.innerHTML = `
       <div style="flex:1;min-width:0">
-        <div style="font-size:18px;color:var(--muted);margin-bottom:5px;user-select:none">☰ Drag to reorder</div>
+        <div class="drag-handle" style="font-size:18px;color:var(--muted);margin-bottom:5px;user-select:none;touch-action:none;cursor:grab">☰ Drag to reorder</div>
         <select class="exercise-name-select" aria-label="Change exercise" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px;font-size:16px;font-weight:700">
           ${exerciseOptionsHtml(exercise.name)}
         </select>
@@ -404,15 +404,17 @@ function renderWorkout(){
     let pointerDragging = false;
     let pointerStartY = 0;
 
-    card.addEventListener("pointerdown", (event) => {
-      // Let dropdowns, inputs, checkboxes, and buttons keep their normal behavior.
-      if (event.target.closest("select, input, button")) return;
+    const dragHandle = header.querySelector(".drag-handle");
+
+    dragHandle.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
       pointerDragging = true;
       pointerStartY = event.clientY;
       card.setPointerCapture(event.pointerId);
       card.style.opacity = "0.6";
       card.style.transform = "scale(0.995)";
       card.style.zIndex = "20";
+      dragHandle.style.cursor = "grabbing";
     });
 
     card.addEventListener("pointermove", (event) => {
@@ -438,6 +440,7 @@ function renderWorkout(){
       card.style.opacity = "";
       card.style.transform = "";
       card.style.zIndex = "";
+      dragHandle.style.cursor = "grab";
 
       const cards = [...document.querySelectorAll(".exercise[data-exercise-id]")];
       const hovered = cards.find(other => {
@@ -659,6 +662,7 @@ render();
 
 
 
+
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -666,5 +670,6 @@ if ("serviceWorker" in navigator) {
   });
 }
 </script>
+
 </body>
 </html>
